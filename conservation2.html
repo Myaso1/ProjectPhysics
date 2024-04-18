@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Сохранение энергии 2</title>
+    </head>
+    
+    <body>
+        <div id="type" data-type="conservation2"></div>
+
+        <div style="position: absolute; width: 48.5%; height: 80%; left: 1%; top: 2%; border: 4px solid">
+            <canvas id="myCanvas" style="position: absolute; height: 100%; width: 100%"></canvas>
+        </div>
+
+        <div style="position: absolute; width: 48.5%; height: 39%; left: 50.5%; top: 2%; border: 4px solid">
+            <div style="position: absolute; width: 100%; height: 100%; bottom: 0%; left: 0%; font-size: 30px;">Кинетическая энергия (Дж)</div>
+            <div style = "position: absolute; width: 100%; height: 2px; left: 0%; top: 50%; background: black;"></div>
+            <canvas id="graph1" style="position: absolute; height: 100%; width: 100%"></canvas>
+            
+        </div>
+        <div style="position: absolute; width: 48.5%; height: 39%; left: 50.5%; top: 43%; border: 4px solid">
+            <div style="position: absolute; width: 100%; height: 100%; bottom: 0%; left: 0%; font-size: 30px;">Потенциальная энергия (Дж)</div>
+            <div style = "position: absolute; width: 100%; height: 2px; left: 0%; top: 50%; background: black;"></div>
+            <canvas id="graph2" style="position: absolute; height: 100%; width: 100%"></canvas>
+        </div>
+        
+        <div class="back" onclick="window.location.href='./index.html'" style="position: absolute; width: 10%; height: 6%; bottom: 0%; left: 0%; background-color: #ff0000;">НАЗАД</div>
+
+        <script type="module" src="./main.js"></script>
+    </body>
+</html>

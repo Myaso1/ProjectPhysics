@@ -1,0 +1,55 @@
+.back:hover {
+    cursor: pointer;
+}
+
+.oscillations .text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    right: 0%;
+    top: 0%;
+    opacity: 0;
+    text-align: center;
+    font-size: 2vw;
+    color: white;
+    background: linear-gradient(rgba(0,0,0,0), grey);
+}
+
+.oscillations .text p {
+    margin: 0%;
+    position: absolute;
+    width: 100%;
+    height: 20%;
+    bottom: 0%;
+}
+
+.oscillations .text:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.conservation .text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    right: 0%;
+    top: 0%;
+    opacity: 0;
+    text-align: center;
+    font-size: 2vw;
+    color: white;
+    background: linear-gradient(rgba(0,0,0,0), grey);
+}
+
+.conservation .text p {
+    margin: 0%;
+    position: absolute;
+    width: 100%;
+    height: 20%;
+    bottom: 0%;
+}
+
+.conservation .text:hover {
+    opacity: 1;
+    cursor: pointer;
+}
