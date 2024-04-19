@@ -106,6 +106,46 @@ if (type == "oscillations") {
             }
         }
     }
+} else if (type == "moon") {
+    simulationWidth = 1.3 * 10 ** 9;
+    dt *= 3600 * 24 * 30;
+    realdt = dt / subSteps;
+
+    var graph1 = document.getElementById("graph1");
+    var g1 = graph1.getContext("2d");
+    var graph2 = document.getElementById("graph2");
+    var g2 = graph2.getContext("2d");
+
+    for (let i = 1; i < 10; i++) {
+        let line = document.createElement("div");
+        line.style.position = "absolute";
+        line.style.width = "2px";
+        line.style.height = "10%";
+        line.style.left = 10 * i + "%";
+        line.style.top = "45%";
+        line.style.background = "black";
+        let text = document.createElement("div");
+        text.style.position = "absolute";
+        text.style.width = "100%";
+        text.style.height = "100%";
+        text.style.left = "calc(" + 10 * i + "% - 5px)";
+        text.style.top = "55%";
+        text.style.fontSize = "30px"
+        text.innerHTML = i + "мес.";
+        let text2 = text.cloneNode();
+        text2.innerHTML = i + "мес.";
+
+        graph1.parentElement.appendChild(line.cloneNode());
+        graph1.parentElement.appendChild(text);
+        graph2.parentElement.appendChild(line);
+        graph2.parentElement.appendChild(text2);
+    }
+
+    var momentum1List = [];
+    var momentum2List = [];
+    
+    bodies.push(new ball(0.018203 * 0.25 * simulationWidth, 5.9742 * 10 ** 24, true, false, new color(0, 0, 150), new vector2(0.5 * simulationWidth, 0.3 * simulationWidth), new vector2(-13.329852, 0)));
+    bodies.push(new ball(0.004964 * 0.25 * simulationWidth, 7.36 * 10 ** 22, true, false, new color(255, 255, 255), new vector2(0.5 * simulationWidth, 0.025 * simulationWidth), new vector2(1082, 0)));
 }
 
 
@@ -130,7 +170,7 @@ function onWindowResize() {
 
         graph3.width = window.innerWidth * 0.485;
         graph3.height = window.innerHeight * 0.2533;
-    } else if (type == "conservation" || type == "conservation2") {
+    } else if (type == "conservation" || type == "conservation2" || type == "moon") {
         canvas.width = window.innerWidth * 0.485;
         canvas.height = window.innerHeight * 0.8;
 
@@ -189,7 +229,7 @@ function simulate() {
                 continue;
             }
             let acceleration;
-            if (false) {
+            if (type == "moon") {
                 acceleration = new vector2();
                 for (let body1 of bodies) {
                     if (body != body1) {
@@ -311,24 +351,61 @@ function update() {
         }
         
         if (steps > 1) {
+            if (type == "conservation") {
+                g1.clearRect(0, 0, graph1.width, graph1.height);
+                g1.lineWidth = 4;
+                g1.beginPath();
+                g1.moveTo(0, graph1.height * (1 - kineticEnergyList[0] / 15));
+                
+                g2.clearRect(0, 0, graph2.width, graph2.height);
+                g2.lineWidth = 4;
+                g2.beginPath();
+                g2.moveTo(0, graph2.height * (1 - potentialEnergyList[0] / 15));
+
+                for (let i = 1; i < kineticEnergyList.length; i++) {
+                    g1.lineTo(0.1 * graph1.width * dt * i, graph1.height * (1 - kineticEnergyList[i] / 15));
+                    g2.lineTo(0.1 * graph2.width * dt * i, graph2.height * (1 - potentialEnergyList[i] / 15));
+                }
+            } else {
+                g1.clearRect(0, 0, graph1.width, graph1.height);
+                g1.lineWidth = 4;
+                g1.beginPath();
+                g1.moveTo(0, graph1.height * (1 - kineticEnergyList[0] / maxEnergy));
+                
+                g2.clearRect(0, 0, graph2.width, graph2.height);
+                g2.lineWidth = 4;
+                g2.beginPath();
+                g2.moveTo(0, graph2.height * (1 - potentialEnergyList[0] / maxEnergy));
+
+                for (let i = 1; i < kineticEnergyList.length; i++) {
+                    g1.lineTo(0.1 * graph1.width * dt * i, graph1.height * (1 - kineticEnergyList[i] / maxEnergy));
+                    g2.lineTo(0.1 * graph2.width * dt * i, graph2.height * (1 - potentialEnergyList[i] / maxEnergy));
+                }
+            }
+            
+            g1.stroke();
+            g2.stroke();
+        }   
+    } else if (type == "moon") {
+        if ((steps - 1) * dt <= 10 * 3600 * 24 * 30) {
+            momentum1List.push(bodies[0].mass * bodies[0].velocity.y);
+            momentum2List.push(bodies[1].mass * bodies[1].velocity.y);
+        }
+        
+        if (steps > 1) {
             g1.clearRect(0, 0, graph1.width, graph1.height);
             g1.lineWidth = 4;
             g1.beginPath();
-            g1.moveTo(0, graph1.height * (1 - kineticEnergyList[0] / maxEnergy));
+            g1.moveTo(0, 0.5 * graph1.height * (1 - momentum1List[0] / 10 ** 26));
             
             g2.clearRect(0, 0, graph2.width, graph2.height);
             g2.lineWidth = 4;
             g2.beginPath();
-            g2.moveTo(0, graph2.height * (1 - potentialEnergyList[0] / maxEnergy));
+            g2.moveTo(0, 0.5 * graph2.height * (1 - momentum2List[0] / 10 ** 26));
 
-            for (let i = 1; i < kineticEnergyList.length; i++) {
-                if (type == "conservation") {
-                    g1.lineTo(0.1 * graph1.width * dt * i, graph1.height * (1 - kineticEnergyList[i] / 15));
-                    g2.lineTo(0.1 * graph2.width * dt * i, graph2.height * (1 - potentialEnergyList[i] / 15));
-                } else {
-                    g1.lineTo(0.1 * graph1.width * dt * i, graph1.height * (1 - kineticEnergyList[i] / maxEnergy));
-                    g2.lineTo(0.1 * graph2.width * dt * i, graph2.height * (1 - potentialEnergyList[i] / maxEnergy));
-                }
+            for (let i = 1; i < momentum1List.length; i++) {
+                g1.lineTo(0.1 * graph1.width * dt * i / (3600 * 24 * 30), 0.5 * graph1.height * (1 - momentum1List[i] / 10 ** 26));
+                g2.lineTo(0.1 * graph2.width * dt * i / (3600 * 24 * 30), 0.5 * graph2.height * (1 - momentum2List[i] / 10 ** 26));
             }
             g1.stroke();
             g2.stroke();
