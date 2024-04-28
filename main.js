@@ -12,6 +12,7 @@ let realdt = dt / subSteps;
 let steps = 0;
 let bodies = [];
 let simulationHeight;
+let paused = false;
 
 if (type == "oscillations") {
     var graph1 = document.getElementById("graph1");
@@ -20,6 +21,16 @@ if (type == "oscillations") {
     var g2 = graph2.getContext("2d");
     var graph3 = document.getElementById("graph3");
     var g3 = graph3.getContext("2d");
+
+    var slider1 = document.getElementById("slider1");
+    var label1 = document.getElementById("label1");
+    var slider2 = document.getElementById("slider2");
+    var label2 = document.getElementById("label2");
+    var slider3 = document.getElementById("slider3");
+    var label3 = document.getElementById("label3");
+    label1.innerHTML = "Начальная скорость тела: " + 0.01 * slider1.value;
+    label2.innerHTML = "Масса тела: " + (0.3 + 0.7 * (0.005 * slider2.value + 0.5));
+    label3.innerHTML = "Жесткость пружины: " + (0.3 + 0.7 * (0.005 * slider3.value + 0.5));
 
     for (let i = 1; i < 10; i++) {
         let line = document.createElement("div");
@@ -57,6 +68,39 @@ if (type == "oscillations") {
     let body1 = new ball(0.005, 1, false, true, new color(0, 0, 0), new vector2(0, 2));
     let body2 = new ball(0.1, 1, false, false, new color(), new vector2(2, 2), new vector2(1, 0));
     bodies.push(body1, body2, new spring(1, body1, body2));
+
+    slider1.oninput = function() {
+        label1.innerHTML = "Начальная скорость тела: " + 0.01 * this.value;
+        bodies[1].velocity = new vector2(0.01 * this.value, 0);
+        bodies[1].position = new vector2(2, 2);
+        positionList = [];
+        velocityList = [];
+        accelerationList = [];
+        steps = 0;
+        paused = true;
+    }
+    slider2.oninput = function() {
+        label2.innerHTML = "Масса тела: " + (0.3 + 0.7 * (0.005 * this.value + 0.5));
+        bodies[1].mass = 0.3 + 0.7 * (0.005 * this.value + 0.5);
+        bodies[1].velocity = new vector2(0.01 * slider1.value, 0);
+        bodies[1].position = new vector2(2, 2);
+        positionList = [];
+        velocityList = [];
+        accelerationList = [];
+        steps = 0;
+        paused = true;
+    }
+    slider3.oninput = function() {
+        label3.innerHTML = "Жесткость пружины: " + (0.3 + 0.7 * (0.005 * this.value + 0.5));
+        bodies[2].stiffness = 0.3 + 0.7 * (0.005 * this.value + 0.5);
+        bodies[1].velocity = new vector2(0.01 * slider1.value, 0);
+        bodies[1].position = new vector2(2, 2);
+        positionList = [];
+        velocityList = [];
+        accelerationList = [];
+        steps = 0;
+        paused = true;
+    }
 } else if (type == "conservation" || type == "conservation2") {
     simulationWidth = 2;
 
@@ -144,10 +188,9 @@ if (type == "oscillations") {
     var momentum1List = [];
     var momentum2List = [];
     
-    bodies.push(new ball(0.018203 * 0.25 * simulationWidth, 5.9742 * 10 ** 24, true, false, new color(0, 0, 150), new vector2(0.5 * simulationWidth, 0.3 * simulationWidth), new vector2(-13.329852, 0)));
-    bodies.push(new ball(0.004964 * 0.25 * simulationWidth, 7.36 * 10 ** 22, true, false, new color(255, 255, 255), new vector2(0.5 * simulationWidth, 0.025 * simulationWidth), new vector2(1082, 0)));
+    bodies.push(new ball(0.018203 * 0.25 * simulationWidth * 10, 5.9742 * 10 ** 24, true, false, new color(0, 0, 150), new vector2(0.5 * simulationWidth, 0.3 * simulationWidth), new vector2(-13.329852, 0)));
+    bodies.push(new ball(0.004964 * 0.25 * simulationWidth * 10, 7.36 * 10 ** 22, true, false, new color(255, 255, 255), new vector2(0.5 * simulationWidth, 0.025 * simulationWidth), new vector2(1082, 0)));
 }
-
 
 function getCanvasPosition(position) {
     return new vector2(canvas.width * position.x / simulationWidth, canvas.height * (1 - position.y / simulationHeight));
@@ -207,7 +250,13 @@ function render() {
                 c.beginPath();
                 c.moveTo(cpos1.x, cpos1.y);
                 for (let k = -2 * n; k <= 2 * n; k++) {
-                    let posn = body.body1.position.add(difference.multiply((k * Math.min(1, 3 * tip / length) + 3) / 6)).add(difference.divide(simulationWidth).rotate90().unit().multiply(2 * tip * simulationWidth * Math.sin(Math.PI * k / 2)));
+                    let posn = body.body1.position.add(
+                        difference.multiply((k * Math.min(1, 3 * tip / length) + 3) / 6)
+                    ).add(
+                        difference.divide(simulationWidth).rotate90().unit().multiply(
+                            2 * tip * simulationWidth * Math.sin(Math.PI * k / 2)
+                        )
+                    );
                     let cposn = getCanvasPosition(posn);
                     c.lineTo(cposn.x, cposn.y);
                 }
@@ -219,7 +268,11 @@ function render() {
 }
 
 function simulate() {
+    paused = false;
     for (let i = 0; i < subSteps; i++) {
+        if (paused) {
+            break;
+        }
         for (let body of bodies) {
             if (body.collided) {
                 body.possibleCollisions = [];
@@ -234,7 +287,9 @@ function simulate() {
                 for (let body1 of bodies) {
                     if (body != body1) {
                         let r = body1.position.subtract(body.position);
-                        acceleration = acceleration.add(r.multiply(gravitationalConstant * body1.mass / r.magnitude() ** 3));
+                        acceleration = acceleration.add(
+                            r.multiply(gravitationalConstant * body1.mass / r.magnitude() ** 3)
+                        );
                     }
                 }
             } else {
@@ -263,15 +318,24 @@ function simulate() {
                 let body2 = collidables[j];
                 let difference = body1.position.subtract(body2.position);
                 let squaredDistance = difference.dotSelf();
-                if ((body1.radius + body2.radius) * Math.sqrt(squaredDistance) > squaredDistance + difference.dot(body1.velocity.subtract(body2.velocity)) * realdt + 0.5 * difference.dot(body1.acceleration.subtract(body2.acceleration)) * realdt ** 2) {
+                if (
+                    (body1.radius + body2.radius) * Math.sqrt(squaredDistance) > squaredDistance +
+                    difference.dot(body1.velocity.subtract(body2.velocity)) * realdt +
+                    0.5 * difference.dot(body1.acceleration.subtract(body2.acceleration)) * realdt ** 2
+                ) {
                     body1.possibleCollisions.push(body2);
                 }
             }
         }
         
         for (let body of bodies) {
-            if (body.position && !body.immovable && !body.collided && !(body.canCollide && body.collision(simulationWidth, simulationHeight, realdt, bodies))) {
-                body.position = body.position.add(body.velocity.multiply(realdt)).add(body.acceleration.multiply(0.5 * realdt ** 2));
+            if (
+                body.position && !body.immovable && !body.collided &&
+                !(body.canCollide && body.collision(simulationWidth, simulationHeight, realdt, bodies))
+            ) {
+                body.position = body.position.add(
+                    body.velocity.multiply(realdt)).add(body.acceleration.multiply(0.5 * realdt ** 2)
+                );
                 body.velocity = body.velocity.add(body.acceleration.multiply(realdt));
             }
         }
@@ -288,14 +352,6 @@ function simulate() {
 onWindowResize();
 addEventListener("resize", onWindowResize);
 
-canvas.addEventListener("mousedown", function(e) {
-    alert(e.pageX);
-});
-
-canvas.addEventListener("wheel", function(e) {
-    onSimulationWidthUpdate();
-});
-
 function update() {
     simulate();
     render();
@@ -310,21 +366,21 @@ function update() {
             g1.clearRect(0, 0, graph1.width, graph1.height);
             g1.lineWidth = 4;
             g1.beginPath();
-            g1.moveTo(0, 0.5 * graph1.height * (1 - (positionList[0] - 2)));
+            g1.moveTo(0, 0.5 * graph1.height * (1 - 0.5 * (positionList[0] - 2)));
             
             g2.clearRect(0, 0, graph2.width, graph2.height);
             g2.lineWidth = 4;
             g2.beginPath();
-            g2.moveTo(0, 0.5 * graph2.height * (1 - velocityList[0]));
+            g2.moveTo(0, 0.5 * graph2.height * (1 - 0.5 * velocityList[0]));
             
             g3.clearRect(0, 0, graph3.width, graph3.height);
             g3.lineWidth = 4;
             g3.beginPath();
-            g3.moveTo(0, 0.5 * graph3.height * (1 - accelerationList[0]));
+            g3.moveTo(0, 0.5 * graph3.height * (1 - 0.5 * accelerationList[0]));
             for (let i = 1; i < positionList.length; i++) {
-                g1.lineTo(0.1 * graph1.width * dt * i, 0.5 * graph1.height * (1 - (positionList[i] - 2)));
-                g2.lineTo(0.1 * graph2.width * dt * i, 0.5 * graph2.height * (1 - velocityList[i]));
-                g3.lineTo(0.1 * graph3.width * dt * i, 0.5 * graph3.height * (1 - accelerationList[i]));
+                g1.lineTo(0.1 * graph1.width * dt * i, 0.5 * graph1.height * (1 - 0.5 * (positionList[i] - 2)));
+                g2.lineTo(0.1 * graph2.width * dt * i, 0.5 * graph2.height * (1 - 0.5 * velocityList[i]));
+                g3.lineTo(0.1 * graph3.width * dt * i, 0.5 * graph3.height * (1 - 0.5 * accelerationList[i]));
             }
             g1.stroke();
             g2.stroke();
@@ -414,6 +470,5 @@ function update() {
 
     requestAnimationFrame(update);
 }
-
 
 update();

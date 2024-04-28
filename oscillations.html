@@ -9,30 +9,39 @@
     <body>
         <div id="type" data-type="oscillations"></div>
 
-        <div style="position: absolute; width: 48.5%; height: 80%; left: 1%; top: 2%; border: 4px solid">
+        <div style="position: absolute; width: 48.5%; height: 80%; left: 1%; top: 2%; border: 4px solid;">
             <canvas id="myCanvas" style="position: absolute; height: 100%; width: 100%"></canvas>
         </div>
 
-        <div style="position: absolute; width: 48.5%; height: 25.33%; left: 50.5%; top: 2%; border: 4px solid">
+        <div style="position: absolute; width: 48.5%; height: 25.33%; left: 50.5%; top: 2%; border: 4px solid;">
             <div style="position: absolute; width: 100%; height: 100%; bottom: 0%; left: 0%; font-size: 30px;">Перемещение (м)</div>
             <div style = "position: absolute; width: 100%; height: 2px; left: 0%; top: 50%; background: black;"></div>
             <canvas id="graph1" style="position: absolute; height: 100%; width: 100%"></canvas>
             
         </div>
-        <div style="position: absolute; width: 48.5%; height: 25.33%; left: 50.5%; top: 29.33%; border: 4px solid">
+        <div style="position: absolute; width: 48.5%; height: 25.33%; left: 50.5%; top: 29.33%; border: 4px solid;">
             <div style="position: absolute; width: 100%; height: 100%; bottom: 0%; left: 0%; font-size: 30px;">Скорость (м/с)</div>
             <div style = "position: absolute; width: 100%; height: 2px; left: 0%; top: 50%; background: black;"></div>
             <canvas id="graph2" style="position: absolute; height: 100%; width: 100%"></canvas>
         </div>
-        <div style="position: absolute; width: 48.5%; height: 25.33%; left: 50.5%; top: 56.66%; border: 4px solid">
+        <div style="position: absolute; width: 48.5%; height: 25.33%; left: 50.5%; top: 56.66%; border: 4px solid;">
             <div style="position: absolute; width: 100%; height: 100%; bottom: 0%; left: 0%; font-size: 30px;">Ускорение (м/с^2)</div>
             <div style = "position: absolute; width: 100%; height: 2px; left: 0%; top: 50%; background: black;"></div>
             <canvas id="graph3" style="position: absolute; height: 100%; width: 100%"></canvas>
         </div>
 
-        <div class="slidecontainer" style="position: absolute; bottom: 8%; left: 20%;">
-            <input id="myRange" type="range" min="-100" max="100" value="0">
+        <div style="position: absolute; width: 10%; height: 3%; left: 25.75%; bottom: 3.5%;">
+            <input id="slider1" class="slider" type="range" min="-100" max="100" value="100">
         </div>
+        <div id="label1" style="position: absolute; width: 10%; height: 3%; left: 25.75%; bottom: 10%; font-size: 20px;"></div>
+        <div style="position: absolute; width: 10%; height: 3%; left: 50.5%; bottom: 3.5%;">
+            <input id="slider2" class="slider" type="range" min="-100" max="100" value="100">
+        </div>
+        <div id="label2" style="position: absolute; width: 10%; height: 3%; left: 50.5%; bottom: 10%; font-size: 20px;"></div>
+        <div style="position: absolute; width: 10%; height: 3%; left: 75.25%; bottom: 3.5%;">
+            <input id="slider3" class="slider" type="range" min="-100" max="100" value="100">
+        </div>
+        <div id="label3" style="position: absolute; width: 10%; height: 3%; left: 75.25%; bottom: 10%; font-size: 20px;"></div>
 
         <div class="back" onclick="window.location.href='./index.html'" style="position: absolute; width: 10%; height: 6%; bottom: 2%; left: 1%; border: 2px solid; background-color: #aaaaaa;">НАЗАД</div>
 
